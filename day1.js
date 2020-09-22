@@ -101,32 +101,26 @@ const data = `123835
 77580
 74726
 `
-const pipeline = [(x) => x / 3, Math.floor, (x) => x - 2]
 
-const calculateFuel = (mass) => {
-  return pipeline.reduce((total, fn) => {
-    return fn(total)
+const calculateFuel = (mass, recursive = false, total = 0) => {
+  const fuel = [(x) => x / 3, Math.floor, (x) => x - 2].reduce((acc, fn) => {
+    return fn(acc)
   }, mass)
-}
 
-const recurFuel = (mass, total = 0) => {
-  const fuel = calculateFuel(mass)
-  if (fuel >= 0) {
-    return recurFuel(fuel, total + fuel)
-  }
-  return total
+  const output = Math.max(fuel, 0) + total
+
+  return recursive && fuel >= 0 ? calculateFuel(fuel, true, output) : output
 }
 
 const arr = data.trim().split('\n').map(x => parseInt(x.trim()))
 
-const firstResponse = arr.reduce((total, curr) => {
+const firstAnswer = arr.reduce((total, curr) => {
   return total + calculateFuel(curr)
 }, 0)
 
-const secondResponse = arr.reduce((total, curr) => {
-  return total + recurFuel(curr)
+const secondAnswer = arr.reduce((total, curr) => {
+  return total + calculateFuel(curr, true)
 }, 0)
 
-console.log(arr)
-console.log('first response', firstResponse)
-console.log('second response', secondResponse)
+console.log('first answer', firstAnswer)
+console.log('second answer', secondAnswer)
